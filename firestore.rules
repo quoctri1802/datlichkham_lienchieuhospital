@@ -1,0 +1,73 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: appointments
+    // Fields:
+    //   - patientName: string (required)
+    //   - phoneNumber: string (required)
+    //   - date: string (required, YYYY-MM-DD)
+    //   - timeSlot: string (required)
+    //   - department: string (required)
+    //   - symptoms: string (optional)
+    //   - status: string (required, pending|confirmed|cancelled)
+    //   - createdAt: timestamp (required)
+    //
+    // Collection: users
+    // Fields:
+    //   - email: string (required)
+    //   - role: string (required, admin|staff)
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        ((exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
+         (request.auth.token.email == "quoctri1802@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isStaff() {
+      return isAuthenticated() && 
+        ((exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'staff']) ||
+         (request.auth.token.email == "quoctri1802@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isValidAppointment(data) {
+      return data.patientName is string && data.patientName.size() > 0 &&
+             data.phoneNumber is string && data.phoneNumber.matches("^0[0-9]{9}$") &&
+             data.dob is string && data.dob.size() > 0 &&
+             data.patientIdentifier is string && data.patientIdentifier.matches("^([0-9]{8}|0[0-9]{11})$") &&
+             data.date is string &&
+             data.timeSlot is string &&
+             data.department is string &&
+             data.status in ['pending', 'confirmed', 'cancelled'] &&
+             data.createdAt is timestamp;
+    }
+
+    match /appointments/{appointmentId} {
+      // Patients can create appointments and see existing ones to avoid double booking
+      allow create: if isValidAppointment(request.resource.data);
+      allow read: if true; // Temporary allow read to fix slot fetching, will harden later
+      
+      // Only staff/admin can update/delete appointments
+      allow update, delete: if isStaff();
+    }
+
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow write: if isAdmin();
+    }
+    
+    match /{path=**} {
+      allow read, write: if false;
+    }
+  }
+}

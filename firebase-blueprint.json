@@ -1,0 +1,42 @@
+{
+  "entities": {
+    "Appointment": {
+      "title": "Appointment",
+      "description": "Lịch hẹn khám bệnh của bệnh nhân",
+      "type": "object",
+      "properties": {
+        "patientName": { "type": "string", "description": "Họ tên bệnh nhân" },
+        "phoneNumber": { "type": "string", "description": "Số điện thoại liên hệ" },
+        "dob": { "type": "string", "format": "date", "description": "Ngày tháng năm sinh" },
+        "patientIdentifier": { "type": "string", "description": "Mã bệnh nhân hoặc số CCCD" },
+        "date": { "type": "string", "format": "date", "description": "Ngày khám" },
+        "timeSlot": { "type": "string", "description": "Khung giờ khám" },
+        "department": { "type": "string", "description": "Chuyên khoa" },
+        "symptoms": { "type": "string", "description": "Triệu chứng" },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "cancelled"], "description": "Trạng thái lịch hẹn" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Thời gian tạo" }
+      },
+      "required": ["patientName", "phoneNumber", "date", "timeSlot", "department"]
+    },
+    "User": {
+      "title": "User",
+      "description": "Thông tin người dùng hệ thống (Admin/Staff)",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email", "description": "Email người dùng" },
+        "role": { "type": "string", "enum": ["admin", "staff"], "description": "Vai trò" }
+      },
+      "required": ["email", "role"]
+    }
+  },
+  "firestore": {
+    "/appointments/{appointmentId}": {
+      "schema": "Appointment",
+      "description": "Danh sách các lịch hẹn khám bệnh"
+    },
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Thông tin phân quyền người dùng"
+    }
+  }
+}
