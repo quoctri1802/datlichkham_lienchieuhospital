@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
-import { Home, Calendar, MessageSquare, LayoutDashboard, LogIn, LogOut } from 'lucide-react';
+import { Home, Calendar, MessageSquare, LayoutDashboard, LogIn, LogOut, MapPin, Phone } from 'lucide-react';
 import { auth } from '../firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { motion } from 'motion/react';
@@ -143,6 +143,38 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <main className="flex-1 max-w-6xl mx-auto w-full p-4 md:p-10">
         {children}
       </main>
+
+      {/* Footer */}
+      <footer className="mt-auto border-t border-slate-200 bg-white/50 backdrop-blur-sm py-8 px-4 md:px-10">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-slate-900 font-bold">
+              <div className="w-6 h-6 bg-blue-600 rounded flex items-center justify-center text-white">
+                <Home size={14} />
+              </div>
+              <span>BV Đa khoa Liên Chiểu</span>
+            </div>
+            <div className="flex items-start gap-2 text-sm text-slate-600">
+              <MapPin size={18} className="text-blue-600 shrink-0 mt-0.5" />
+              <span>525 Tôn Đức Thắng, phường Hòa Khánh, TP. Đà Nẵng</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 bg-blue-50 px-4 py-3 rounded-2xl border border-blue-100">
+            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-100">
+              <Phone size={20} />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Hỗ trợ 24/7</span>
+              <span className="text-lg font-bold text-slate-900">0967.509.511</span>
+            </div>
+          </div>
+        </div>
+        <div className="max-w-6xl mx-auto mt-8 pt-6 border-t border-slate-100 text-center">
+          <p className="text-xs text-slate-400 font-medium tracking-wide">
+            © {new Date().getFullYear()} Bệnh viện Đa khoa Liên Chiểu. Tất cả quyền được bảo lưu.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
